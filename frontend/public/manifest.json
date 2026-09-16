@@ -1,0 +1,15 @@
+{
+  "short_name": "ISA",
+  "name": "Influencing Style Assessment",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#A63D2F",
+  "background_color": "#f8f9fa"
+}
