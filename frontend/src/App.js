@@ -243,23 +243,40 @@ const CHART_COLORS = {
 // --- PDF GENERATOR ---
 
 const generateReport = async (userInfo, results, styleDescs, styleIndices, styleMxs) => {
-    // Fetch logo as base64 and capture natural dimensions for correct aspect ratio
+    // Fetch logo and flatten any transparency onto a white background using canvas.
+    // jsPDF's addImage does not reliably respect PNG alpha channels — it can render
+    // the raw (often black) RGB values that sit underneath a transparent pixel.
+    // Compositing onto white ourselves guarantees no black artifacts, regardless of
+    // how the source PNG was encoded.
     let logoBase64 = null;
     let logoAspect = 3; // fallback
     try {
         const res  = await fetch('/logo.png');
         const blob = await res.blob();
-        logoBase64 = await new Promise((resolve) => {
+        const rawDataUrl = await new Promise((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result);
             reader.readAsDataURL(blob);
         });
-        await new Promise((resolve) => {
-            const img = new Image();
-            img.onload  = () => { logoAspect = img.naturalWidth / img.naturalHeight; resolve(); };
-            img.onerror = resolve;
-            img.src = logoBase64;
+
+        const img = await new Promise((resolve, reject) => {
+            const im = new Image();
+            im.onload  = () => resolve(im);
+            im.onerror = reject;
+            im.src = rawDataUrl;
         });
+
+        logoAspect = img.naturalWidth / img.naturalHeight;
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+
+        logoBase64 = canvas.toDataURL('image/png');
     } catch (e) {
         console.warn('Logo could not be loaded:', e);
     }
