@@ -343,8 +343,11 @@ const generateReport = async (userInfo, results, styleDescs, styleIndices, style
     if (logoBase64) {
         const logoW = 38;
         const logoH = logoW / logoAspect;
+        // White background to prevent PNG transparency rendering as black
+        doc.setFillColor(255, 255, 255);
+        doc.rect(pW - m - logoW, y, logoW, logoH, 'F');
         doc.addImage(logoBase64, 'PNG', pW - m - logoW, y, logoW, logoH);
-        logoEndY = y + logoH + 5; // 5mm padding below logo
+        logoEndY = y + logoH + 5;
     }
     y = 64;
 
