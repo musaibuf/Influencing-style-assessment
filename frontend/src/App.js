@@ -12,7 +12,7 @@ import Plotly from 'plotly.js-dist-min';
 import createPlotlyComponent from 'react-plotly.js/factory';
 const Plot = createPlotlyComponent(Plotly);
 
-const BACKEND_URL = 'http://localhost:5000/api/submit-influencing';
+const BACKEND_URL = 'https://influencing-style-assessment-backend.onrender.com/api/submit-influencing';
 
 // --- THEME (unchanged) ---
 let theme = createTheme({
